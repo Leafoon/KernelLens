@@ -1,0 +1,56 @@
+# macOS and editor temporary files
+.DS_Store
+*.swp
+*.swo
+
+# Python virtual environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Build and test artifacts
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
+*.log
+
+# Local secrets; a placeholder example may be versioned later
+.env
+.env.*
+!.env.example
+
+# Local Agent sessions, artifacts, and validation workspaces
+.kernellens/
+
+# Independent TileLang checkout and reproducible repo-local knowledge delivery
+/tilelang/
+
+# Personal collaboration notes and one-off implementation plans
+/AGENTS.md
+/PROJECT_STATE.md
+/IMPLEMENTATION_PLAN.md
+/RAG_IMPLEMENTATION_PLAN.md
+.codex/
+.agents/
+.idea/
+.vscode/
+
+# Local credentials, reports, and database sidecars
+*.pem
+*.key
+credentials*.json
+*.sqlite3-wal
+*.sqlite3-shm
+*.sqlite3-journal
+coverage.xml
+.coverage.*
+.uv-cache/
+/artifacts/
+
+# The bundled SQLite knowledge database is release content, not a cache.
+!src/kernellens/data/tilelang/index.sqlite3

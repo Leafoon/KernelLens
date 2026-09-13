@@ -1,0 +1,30 @@
+{
+  "candidate_path": "artifacts/gemm.py",
+  "candidate_sha256": "replace-with-actual-sha256-from-read-file",
+  "environment": {
+    "gpu": "NVIDIA A100",
+    "tilelang_revision": "replace-with-actual-revision",
+    "cuda_version": "replace-with-actual-version"
+  },
+  "workload": {
+    "M": 128,
+    "N": 128,
+    "K": 128,
+    "input_dtype": "float16",
+    "output_dtype": "float16",
+    "accum_dtype": "float32",
+    "layout": "row-major"
+  },
+  "measurement": {
+    "method": "cuda-events",
+    "warmup": 10,
+    "iterations_per_sample": 100
+  },
+  "checks": {
+    "compilation": "not_run",
+    "correctness": "not_run"
+  },
+  "latency_ms": [],
+  "source": "user_report",
+  "note": "模板；没有真实测量值。请保留原始执行日志。"
+}
