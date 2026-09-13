@@ -47,7 +47,7 @@ def gallery_text():
         "编辑图源后，在项目根运行 `python3 scripts/sync_diagrams.py`；"
         "用 `python3 scripts/sync_diagrams.py --check` 检查是否同步。"
         "同步检查不代替 Mermaid 解析或渲染检查。",
-        "产品范围见 [product.md](../product.md)，实际状态见 "
+        "产品范围见 [Agent 原理](../agent-guide.md#overview)，实际状态见 "
         "[当前能力与验证范围](../status.md)。",
     ]
     for stem, title in DIAGRAMS:

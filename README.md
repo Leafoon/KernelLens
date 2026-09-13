@@ -13,6 +13,7 @@ KernelLens 与 TileLang 知识包在同一仓库分发。普通用户无需克�
 | 诊断 | 阅读工作区代码、日志或用户报告，返回带证据的解释 |
 | RAG | 内置 4,337 个语义单元，分 API、Concept、Example、Compiler、Operator 检索 |
 | GPU 输入 | 支持需求内声明、`--gpu`、`/gpu`；缺少型号时主动询问并恢复原任务 |
+| 终端界面 | 全屏对话、多行输入、`/` 命令联想、实时步骤、文件预览和会话选择；保留逐行 CLI |
 | 连续会话 | 工作区切换、历史记录、运行轨迹、中断后继续 |
 | 验证与预算 | AST、有限 GEMM/API 检查、交付审核、调用预算和报告比较 |
 
@@ -37,22 +38,23 @@ model=your-model-id
 api_key=your-private-key
 ```
 
-启动 Agent，选择一个已存在的任务工作区：
+启动终端界面，使用当前目录作为工作区；Ctrl+O 可选择另一个已存在的目录：
 
 ```bash
 uv run --locked kernellens
 ```
 
 ```text
-workspace> /path/to/my-workspace
-你> /gpu NVIDIA A100
-你> /generate 生成基础 GEMM，M=N=K=128，A/B/C float16，累加 float32。
-你> /optimize 基于 artifacts/gemm.py 提出一个参数优化，保存候选和实验说明。
-你> /diagnose 读取 compile.log，分析错误并引用证据。
-你> /exit
+/gpu NVIDIA A100
+/generate 生成基础 GEMM，M=N=K=128，A/B/C float16，累加 float32。
+/optimize 基于 artifacts/gemm.py 提出一个参数优化，保存候选和实验说明。
+/diagnose 读取 compile.log，分析错误并引用证据。
+/exit
 ```
 
-生成、优化缺少目标 GPU 型号时，会先询问并进入 `waiting_input`，该次输入检查不调用模型。直接回复型号即可继续；`/gpu` 查看，`/gpu clear` 清空。不会自动把开发机或示例中的设备当作执行目标。
+输入 `/` 联想命令，↑↓ 选择、Tab 补全；Enter 发送，Ctrl+J 换行，Ctrl+G 设置 GPU，Ctrl+R 恢复会话。宽窗口右侧显示执行步骤和生成文件；按 F1 查看帮助。需要原来的逐行提示符时使用 `--plain`。详见 [终端界面手册](docs/tui.md)。
+
+生成、优化缺少目标 GPU 型号时，会先询问并进入 `waiting_input`，该次输入检查不调用模型。直接回复型号即可继续；`/gpu` 查看或设置，`/gpu clear` 清空。不会自动把开发机或示例中的设备当作执行目标。
 
 ## 常用命令
 
@@ -70,8 +72,8 @@ uv run --locked kernellens -w /path/to/workspace --resume SESSION_ID
 uv run --locked python -m kernellens.knowledge validate
 uv run --locked python -m kernellens.knowledge search 'T.copy 的同步语义'
 
-# 开发检查：不调用真实供应商
-uv run --locked python scripts/check_project.py
+# 知识包完整性检查：不调用模型
+uv run --locked python -m kernellens.knowledge validate
 ```
 
 模型配置在启动时加载，修改后需重启。环境变量优先于 dotenv，CLI 参数优先于环境变量。真实 Agent 任务使用配置的模型服务，可能产生费用；离线知识查询和默认开发检查不调用供应商。
@@ -79,28 +81,27 @@ uv run --locked python scripts/check_project.py
 ## 仓库内容
 
 ```text
-src/kernellens/             CLI、Agent Loop、模型适配、工具、审核与 GPU 输入
+src/kernellens/             TUI、CLI、Agent Loop、模型适配、工具、审核与 GPU 输入
 src/kernellens/data/tilelang/
                            内置知识正文与索引、manifest、上游许可和 notices
-tests/                     自动测试与本地模型替身
-knowledge/                 公开的检索回归问题
 examples/                  服务器验证报告模板
-scripts/                   开发检查、知识评估、图源同步及显式真实验收
-docs/                      使用手册、原理、架构决策和学习材料
+scripts/                   文档图源同步
+docs/                      使用手册、方法原理、架构决策与总览图
 ```
 
 知识包约 31 MiB，完整正文保存在 SQLite 中，并随 wheel 分发。维护者更新知识时才需要原始 TileLang 源码，流程见 [RAG 文档](docs/tilelang-rag.md)。
 
-仓库不包含 `.env`、个人 Agent 会话、生成的实验产物、本地 TileLang 克隆、虚拟环境、缓存或构建包。具体规则见 [.gitignore](.gitignore) 和 [发布内容说明](docs/repository.md)。
+测试、检索评估数据、验收脚本和逐步学习讲义保留在维护者本地。仓库不包含 `.env`、个人 Agent 会话、生成的实验产物、本地 TileLang 克隆、虚拟环境、缓存或构建包。具体规则见 [.gitignore](.gitignore) 和 [发布内容说明](docs/repository.md)。
 
 ## 验证边界
 
-当前本地回归为 **438 项测试通过、28/28 条检索回归通过**，知识包校验与 sdist/wheel 构建通过。详见 [当前状态](docs/status.md) 和 [工程验证](docs/validation.md)。
+维护者本地回归记录为 **464 项测试通过、28/28 条检索回归通过**；完整测试集不随当前仓库分发。知识包校验与 sdist/wheel 构建通过。详见 [当前状态](docs/status.md) 和 [工程验证](docs/validation.md)。
 
 检索到源码、工具调用完成、静态检查通过和 GPU 运行正确是不同结论。程序不自动运行候选；没有可比较的真实测量时不宣称性能提升。模型产物及其运行建议需要独立审阅。
 
 ## 文档与贡献
 
+- [终端界面手册](docs/tui.md)
 - [CLI 使用手册](docs/cli.md)
 - [Agent 功能、架构与方法原理](docs/agent-guide.md)
 - [TileLang RAG 原理与知识包维护](docs/tilelang-rag.md)

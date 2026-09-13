@@ -6,14 +6,13 @@
 
 内置快照包含来自 856 个文件的 4,337 个语义单元：API 1,148、instruction 134、concept 215、example 240、operator 107、compiler 2,493。五张检索索引存在交叉归属，索引行数不等于独立单元数。
 
-公开回归集位于 `knowledge/evaluation_queries.json`，当前 **28/28** 通过，覆盖精确符号、双语概念、API facade、未知符号、基本算子、目标后端、编译器、完整长需求与上下文预算。
+维护者本地保留 28 条检索回归问题，当前 **28/28** 通过，覆盖精确符号、双语概念、API facade、未知符号、基本算子、目标后端、编译器、完整长需求与上下文预算。
 
 ```bash
 uv run --locked python -m kernellens.knowledge validate
-uv run --locked python scripts/evaluate_knowledge.py
 ```
 
-这是开发中公开调整的回归集，不是盲测集或通用问答准确率。测试还覆盖分页、过期来源、损坏包、候选上限、扩库噪声、工具 JSON 大小和首次预检索。
+评估问题和脚本不随当前仓库分发。这是开发中调整的回归集，不是盲测集或通用问答准确率。测试还覆盖分页、过期来源、损坏包、候选上限、扩库噪声、工具 JSON 大小和首次预检索。
 
 ## 独立分发
 

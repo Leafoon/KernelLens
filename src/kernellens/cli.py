@@ -54,6 +54,9 @@ def parser() -> argparse.ArgumentParser:
     )
     result.add_argument("--env-file", type=Path, help="显式 dotenv 路径")
     result.add_argument("--prompt", "-p", help="单次任务，执行后退出；可与 --json 配合")
+    interface = result.add_mutually_exclusive_group()
+    interface.add_argument("--tui", action="store_true", help="启动全屏终端界面")
+    interface.add_argument("--plain", action="store_true", help="使用原有逐行终端交互")
     result.add_argument(
         "--task",
         choices=[item.value for item in TaskType],
@@ -97,6 +100,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     if args.json and args.prompt is None:
         parser().error("--json 需要 --prompt")
+    if args.tui and (args.prompt is not None or args.doctor or args.check_api):
+        parser().error("--tui 不能与 --prompt、--doctor 或 --check-api 一起使用")
     app = None
     redact = Redactor()
 
@@ -148,6 +153,28 @@ def main(argv: list[str] | None = None) -> int:
                     "模型连接通过；" + json.dumps(client.usage(), ensure_ascii=False)
                 )
             return 0
+        use_tui = args.tui or (
+            not args.plain
+            and args.prompt is None
+            and sys.stdin.isatty()
+            and sys.stdout.isatty()
+        )
+        if use_tui:
+            if not (sys.stdin.isatty() and sys.stdout.isatty()):
+                raise ValueError("--tui 需要交互式终端；管道输入请使用 --plain")
+            from kernellens.tui import KernelLensTUI
+
+            terminal_app = KernelLensTUI(
+                Workspace(args.workspace or origin),
+                settings,
+                resume=args.resume,
+                gpu=args.gpu,
+                task_type=TaskType(args.task) if args.task else None,
+            )
+            exit_code = terminal_app.run()
+            if terminal_app.startup_error:
+                output("错误：" + terminal_app.startup_error)
+            return exit_code or 0
         if args.workspace is not None:
             workspace = Workspace(args.workspace)
         elif args.prompt is not None:

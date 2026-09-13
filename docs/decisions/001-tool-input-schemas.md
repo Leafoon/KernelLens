@@ -1,11 +1,11 @@
 # ADR 001：工具输入采用 Pydantic 声明与 JSON Schema 导出
 
-Status: Accepted for TOOL-001A（依赖已验证，参数模型待用户实现）。
+Status: Accepted。工具参数模型、注册与校验现已实现；本文保留最初选型背景。
 Date: 2026-09-10。
 
 ## Context
 
-Phase 2 的有限 Runtime 已提交为 df1fee6，CallToolAction 只校验通用标量映射。
+最初的有限 Runtime 中，CallToolAction 只校验通用标量映射。
 Phase 3 需要逐个工具的参数规则，并向后续模型适配器提供参数说明。
 如果分别维护 Python 校验代码和 Schema 字典，规则变更容易只更新其中一份。
 
@@ -53,4 +53,4 @@ cp312-cp312-macosx_11_0_arm64，扩展文件为 Mach-O arm64。
 对应发行提供 macOS ARM64 wheel。[pydantic-core 发行文件](https://pypi.org/project/pydantic_core/2.46.5/)
 
 依赖安装后原有 326 个测试通过（0.12s），Ruff lint/format 通过（33 个 Python 文件，包含空包入口）。
-参数模型与新测试尚未写入，相关功能尚未验收。Linux ARM64 服务器环境尚未实测。
+上述为最初依赖选型阶段的结果；当前能力和维护者验证记录见 [当前状态](../status.md)。Linux ARM64 服务器环境尚未完成同等验收。

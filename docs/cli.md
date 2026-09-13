@@ -2,7 +2,7 @@
 
 ## 安装和配置
 
-在项目根目录运行 `uv sync --locked`。运行依赖为 Pydantic 2.13.5，其余 CLI、HTTP、SQLite 和静态分析使用 Python 3.12 标准库；uv.lock 固定全部依赖。项目和安装包已包含 TileLang 知识包，无需 clone TileLang、下载额外知识或设置本地源码路径。
+在项目根目录运行 `uv sync --locked`。直接运行依赖为 Pydantic 2.13.5 和 Textual 8.2.8（终端界面）；HTTP、SQLite 和静态分析使用 Python 3.12 标准库；uv.lock 固定全部依赖。项目和安装包已包含 TileLang 知识包，无需 clone TileLang、下载额外知识或设置本地源码路径。
 
 ```dotenv
 base_url=https://your-provider.example/v1
@@ -31,7 +31,9 @@ Token 门槛不是供应商账单硬上限：输入 Token、未返回 usage 的�
 
 ## 交互流程
 
-运行 `uv run --locked kernellens`，选择一个已存在目录。路径可包含中文或空格。无效路径会提示重新选择；输入 q 或 Ctrl+D 退出。
+正常终端中运行 `uv run --locked kernellens` 默认打开全屏 TUI，工作区为启动目录。输入 `/` 联想命令、↑↓ 选择、Tab 补全；Enter 发送、Ctrl+J 换行、Ctrl+O 选择工作区；右侧显示步骤与生成文件。可显式使用 `--tui`，详见 [终端界面手册](tui.md)。
+
+以下提示符、`/paste` 和 Ctrl+C 行为描述原逐行界面。运行 `uv run --locked kernellens --plain`，选择一个已存在目录。路径可包含中文或空格。无效路径会提示重新选择；输入 q 或 Ctrl+D 退出。
 
 直接输入需求后，屏幕显示决策序号、工具执行状态和最终报告。可明确选择任务类型：
 
@@ -44,7 +46,7 @@ Token 门槛不是供应商账单硬上限：输入 Token、未返回 usage 的�
 | 交互命令 | 用途 |
 | --- | --- |
 | /help | 查看全部命令 |
-| /paste | 多行输入，以单独一行 /end 结束 |
+| /paste | 仅逐行界面：多行输入，以单独一行 /end 结束 |
 | /workspace [路径] | 选择或切换工作区，创建该工作区的新会话 |
 | /new | 当前工作区新建会话 |
 | /sessions | 列出最近会话 |
@@ -53,12 +55,15 @@ Token 门槛不是供应商账单硬上限：输入 Token、未返回 usage 的�
 | /runs | 查看本会话每轮状态 |
 | /trace [ID] | 查看运行的行动、反馈和错误 |
 | /status | 查看工作区、模型与预算配置，不显示密钥 |
+| /files、/open | 仅 TUI：浏览工作区文件和只读预览 |
 | /gpu [型号] | 查看或设置当前会话的目标 GPU；/gpu clear 清空 |
 | /exit | 退出，保留已写入的记录 |
 
 请求补充信息后直接输入答案。应用将上一轮未完成的目标和本次补充一起交给新一轮，保留会话，使用新的次数预算。失败、中断或预算耗尽后输入“继续”或“重试”，同样重新读取当前文件后推进原目标。它不是自动重放旧 HTTP 请求或写入动作。
 
-Ctrl+C 中断运行时，已保存的文件和步骤保留，状态记为 interrupted；可继续交互。输入提示符下 Ctrl+C 仅取消当前输入。进程被强制结束后，下一次打开工作区会把已确认原进程不存在的 running 记录标为 interrupted。不会恢复到一次写入的中间位置。
+逐行界面中，Ctrl+C 中断运行时，已保存的文件和步骤保留，状态记为 interrupted；可继续交互。输入提示符下 Ctrl+C 仅取消当前输入。进程被强制结束后，下一次打开工作区会把已确认原进程不存在的 running 记录标为 interrupted。不会恢复到一次写入的中间位置。
+
+TUI 使用 Ctrl+Q 退出；任务运行中按下会在本轮完成并保存后退出，当前任务仍会继续执行。TUI 没有立即停止按钮，也不改变 Runtime 的中断逻辑。
 
 ## 目标 GPU
 
@@ -149,14 +154,8 @@ stdout 为一个 JSON 对象：run_id、session_id、status、answer、report_pa
 - 文件冲突：先重新读取当前版本，不直接覆盖。
 - 记录保存失败：CLI 返回错误；先检查磁盘空间、权限或 SQLite 文件，不能把这种运行当作已可靠保存。
 
-## 开发检查
+## 安装与维护检查
 
-`uv run --locked pytest -q` 默认不调用真实 API；其中 CLI 测试需要允许监听 localhost。受限沙箱中可能需在普通终端执行。
+仓库内可执行的源码、知识包、图源和构建检查见 [验证说明](validation.md)。完整自动测试与真实验收脚本由维护者在本地保留；克隆后的运行不依赖它们。
 
-显式真实验收：
-
-```bash
-uv run --locked python scripts/smoke_live.py --case all
-```
-
-这会创建隔离工作区并运行诊断、GEMM 生成、优化。结果不仅检查完成状态和文件存在，还核对 GEMM 静态声明；失败不会被标记为完成。API 账户不可用时保留失败记录，恢复后用新验收目录重跑。GPU 验证不在本机自动执行。
+`--check-api` 只验证一次模型连接，不证明生成或优化效果。真实候选仍需在目标 GPU 上独立检查与测量。

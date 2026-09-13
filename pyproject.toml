@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "pydantic==2.13.5",
+    "textual==8.2.8",
 ]
 
 [project.scripts]
@@ -23,10 +24,6 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-name = "kernellens"
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = ["--import-mode=importlib", "--strict-config", "--strict-markers"]
-
 [tool.ruff]
 target-version = "py312"
 line-length = 88
@@ -39,6 +36,5 @@ known-first-party = ["kernellens"]
 
 [dependency-groups]
 dev = [
-    "pytest==9.1.1",
     "ruff==0.16.6",
 ]

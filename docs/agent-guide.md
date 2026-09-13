@@ -69,8 +69,8 @@ MVP 聚焦基础 GEMM，即矩阵乘法 `C = A × B`。可以把 M、N、K 理�
 
 | 功能 | 用户可以做什么 | 当前实现方式 |
 | --- | --- | --- |
-| 工作区选择 | 启动后选择一个已有目录 | 终端选择器与 Workspace 对象 |
-| 连续交互 | 多轮提出任务、补充信息 | CLI 输入循环与 SQLite 会话 |
+| 工作区选择 | 使用或切换到一个已有目录 | TUI 弹窗 / 逐行选择器与 Workspace 对象 |
+| 连续交互 | 多轮提出任务、补充信息 | TUI / CLI 与共享 SQLite 会话 |
 | 明确任务类型 | 使用 `/generate`、`/optimize`、`/diagnose` | TaskType 与任务 Prompt |
 | 文件调查 | 列目录、读片段、搜文本 | 工作区文件工具，返回路径、行号或哈希 |
 | 产物生成 | 保存 Python 候选及 Markdown 文档 | write_file、哈希冲突检查与备份 |
@@ -90,7 +90,7 @@ MVP 聚焦基础 GEMM，即矩阵乘法 `C = A × B`。可以把 M、N、K 理�
 
 ### 3.1 环境与启动
 
-项目使用 Python 3.12，运行依赖为 Pydantic 2.13.5，开发检查使用 pytest 9.1.1 和 Ruff 0.16.6。完整依赖版本由 [pyproject.toml](../pyproject.toml) 和 [uv.lock](../uv.lock) 管理。
+项目使用 Python 3.12，直接运行依赖为 Pydantic 2.13.5 和 Textual 8.2.8，仓库开发检查使用 Ruff 0.16.6；维护者另以本地 pytest 9.1.1 测试集验收，测试不随仓库分发。安装依赖版本由 [pyproject.toml](../pyproject.toml) 和 [uv.lock](../uv.lock) 管理。
 
 在项目根目录执行：
 
@@ -101,7 +101,9 @@ uv run --locked kernellens
 
 `uv sync --locked` 按锁文件同步环境；`uv run` 使用项目环境启动程序。命令名 `kernellens` 在 pyproject.toml 中映射到 `kernellens.cli:main`。也可以用 `uv run --locked python -m kernellens` 进入相同 CLI。
 
-终端交互示意：
+正常终端默认打开全屏 TUI：Enter 发送、Ctrl+J 换行、Ctrl+O 工作区、Ctrl+G GPU。对话、步骤和只读文件预览都在终端里，具体布局、线程和验证见 [TUI 手册](tui.md)。
+
+以下是 `uv run --locked kernellens --plain` 的原逐行交互示意：
 
 ```text
 选择工作区 workspace（回车使用当前目录；输入路径切换；q 退出）
@@ -152,7 +154,7 @@ dotenv 从启动目录向上查找；可编辑安装还会尝试项目根目录�
 | `/runs` | 查看当前会话最近的运行 |
 | `/trace [ID前缀]` | 查看最近或指定运行的步骤和反馈 |
 | `/status` | 查看工作区、模型、模式及部分预算 |
-| `/paste` | 输入多行任务，用独立一行 `/end` 结束 |
+| `/paste` | 仅逐行界面：输入多行任务，用独立一行 `/end` 结束 |
 | `/help` | 显示命令帮助 |
 | `/exit` | 退出并关闭数据库 |
 
@@ -181,7 +183,7 @@ uv run --locked kernellens \
 终端用户
    │
    ▼
-CLI：参数解析、工作区选择、命令与输出
+CLI：参数解析，选择 TUI / 逐行 / 单次入口
    │
    ▼
 AgentApplication：创建本轮运行，连接各个组件
@@ -703,6 +705,8 @@ Run 2：原目标 + 设备补充 → 重新读取相关材料 → 继续处理
 
 ### 14.3 Ctrl+C 与进程退出
 
+以下 Ctrl+C/Ctrl+D 行为属于 `--plain`。TUI 中 Ctrl+Q 在空闲时退出，运行中设为本轮完成并保存后退出；当前任务继续执行。
+
 - 在普通输入提示符按 Ctrl+C：取消当前输入，继续交互。
 - 在 Agent 执行过程中按 Ctrl+C：应用尽力保存中断状态、已完成步骤和产物。
 - Ctrl+D 或 `/exit`：退出并关闭数据库。
@@ -870,6 +874,7 @@ median_ratio       = baseline_median_ms / candidate_median_ms
 | --- | --- |
 | dataclass / StrEnum | 明确领域对象和有限状态，保留 Python 直接可读性 |
 | Pydantic | 将工具说明和实际输入校验建立在同一参数模型上 |
+| Textual | 全屏终端控件、键盘事件、后台 worker 与界面测试 |
 | argparse | 实现标准命令行参数、帮助和返回码 |
 | urllib | 满足当前 HTTP 请求、timeout 和错误处理，不额外引入 SDK 重试层 |
 | SQLite | 本地事务与重启后查询，不要求部署数据库服务 |
@@ -945,7 +950,7 @@ CLI 初版验收记录包括：371 个自动测试通过，Ruff 检查通过，�
 | 7 | [workspace.py](../src/kernellens/tools/workspace.py) | 文件读写和报告比较的边界是什么？ |
 | 8 | [constraints.py](../src/kernellens/constraints.py)、[review.py](../src/kernellens/review.py) | “可以提交”具体由哪些程序条件决定？ |
 | 9 | [storage.py](../src/kernellens/storage.py) | 哪些信息持久化，怎样恢复会话？ |
-| 10 | [test_live_protocol.py](../tests/test_live_protocol.py)、[test_cli.py](../tests/test_cli.py) | 如何用可控制的输入证明这些边界？ |
+| 10 | [验证说明](validation.md) | 哪些行为经过维护者本地检查，哪些仍需独立验证？ |
 
 ### 20.2 术语表
 

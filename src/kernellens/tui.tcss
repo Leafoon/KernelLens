@@ -1,0 +1,75 @@
+Screen {
+    background: #10151c;
+    color: #dce6f1;
+    layers: base commands;
+}
+#brandbar { height: 3; padding: 1 2 0 2; background: #151d27; }
+#brand { width: 24; color: #89e0cf; text-style: bold; }
+#tagline { color: #788da7; text-align: right; width: 1fr; }
+#context, #environment { height: 1; padding: 0 2; background: #151d27; }
+#context { color: #acbdd0; }
+#workspace-context { width: 1fr; text-wrap: nowrap; text-overflow: ellipsis; }
+#session-context { width: 19; text-align: right; color: #788da7; }
+#gpu-context { width: 1fr; color: #89e0cf; text-wrap: nowrap; text-overflow: ellipsis; }
+#gpu-context.pending { color: #e5bf87; }
+#model-context { width: 1fr; text-align: right; color: #788da7; text-wrap: nowrap; text-overflow: ellipsis; }
+#body { height: 1fr; }
+#conversation { width: 1fr; padding: 1 2; scrollbar-size: 1 1; scrollbar-color: #3c5267; scrollbar-background: #10151c; }
+#welcome { height: auto; padding: 1 2; margin: 1 0; border: round #334c56; background: #151e28; }
+#welcome-title { height: 2; color: #dce6f1; text-style: bold; }
+#welcome-subtitle { height: auto; color: #96abc3; margin-bottom: 1; }
+#starters { height: 3; margin-bottom: 1; }
+#starters Button { height: 3; width: 1fr; min-width: 0; margin-right: 1; }
+#welcome-tip { height: auto; color: #78928f; }
+.message { height: auto; padding: 0 1; margin: 1 0; }
+.message-role { color: #89e0cf; text-style: bold; height: 1; margin-bottom: 1; }
+.message.user { padding: 1; background: #1b2837; border-left: wide #698faf; }
+.message.user .message-role { color: #adcceb; margin-bottom: 0; }
+.message.system { border-left: wide #e5bf87; }
+.message Static { height: auto; }
+.message Markdown { padding: 0; background: transparent; margin: 0; }
+#sidebar { width: 32; padding: 1; background: #141c26; border-left: solid #263544; }
+.panel-title { height: 2; color: #a5bacf; text-style: bold; }
+#activity { height: 1fr; background: #141c26; padding: 0; scrollbar-size: 1 1; scrollbar-color: #3c5267; }
+#activity-empty, #artifacts-empty { height: auto; color: #70849d; padding-bottom: 1; }
+#artifacts { height: 5; background: #141c26; border: none; padding: 0; }
+#sidebar Button { width: 100%; min-width: 0; height: 3; margin-bottom: 1; }
+Button { background: #253344; color: #c1d0e2; border: none; }
+Button:hover { background: #31485c; }
+Button:focus { background: #31485c; text-style: bold; }
+Button.-primary { background: #80d9c8; color: #142e2a; text-style: bold; }
+Button.-primary:hover { background: #a1eadb; }
+Button:disabled { background: #1e2b37; color: #65798d; }
+#status { height: 1; padding: 0 2; color: #89e0cf; }
+#compose-row { height: 5; margin: 0 2; padding: 0 1; border: round #385463; background: #172330; }
+#compose-row:focus-within { border: round #80d9c8; }
+#composer, #composer:focus { width: 1fr; height: 3; border: none; background: #172330; }
+#send { width: 10; min-width: 10; height: 3; margin-left: 1; }
+#input-hint { height: 1; padding: 0 3; color: #8296ae; }
+Footer { background: #151d27; color: #8aa2ba; }
+#command-menu { display: none; position: absolute; layer: commands; height: 9; padding: 0 1; border: round #80d9c8; background: #1b2a39; }
+#command-heading { height: 1; color: #9db7ce; text-style: bold; }
+#command-options { height: 1fr; padding: 0; border: none; background: #1b2a39; scrollbar-size: 1 1; scrollbar-color: #5c8e92; }
+#command-options > .option-list--option { padding: 0 1; color: #b2c4d9; }
+#command-options > .option-list--option-highlighted { background: #2d505b; color: #e4fff7; text-style: bold; }
+#command-options > .option-list--option-hover { background: #283d50; }
+#command-hint { height: 1; color: #91b0ad; text-wrap: nowrap; text-overflow: ellipsis; }
+ModalScreen { align: center middle; background: #080c12 80%; }
+.dialog { background: #1a2836; border: round #658f97; padding: 1 2; width: 85%; max-width: 110; }
+.dialog-title { height: 2; text-style: bold; color: #89e0cf; }
+.hint { height: auto; color: #aabdd1; margin-bottom: 1; }
+.value-dialog { height: auto; }
+.value-dialog Input { margin: 1 0; background: #14212d; border: tall #385463; }
+.value-dialog Input:focus { border: tall #80d9c8; }
+.dialog-buttons { height: 3; align-horizontal: right; }
+.dialog-buttons Button { margin-left: 1; }
+.preview-dialog { height: 85%; }
+#preview { height: 1fr; background: #111b26; border: tall #385463; }
+#close-preview { dock: bottom; margin-top: 1; }
+.picker-dialog { height: 70%; }
+#choices { height: 1fr; background: #111b26; margin-bottom: 1; }
+Screen.compact #welcome { margin: 0; padding: 0 1; }
+Screen.compact #welcome-title { height: 1; }
+Screen.compact #welcome-subtitle { margin-bottom: 0; }
+Screen.compact #starters { margin-bottom: 0; }
+FooterKey > .footer-key--key { color: #9dbebd; background: #202e3d; }

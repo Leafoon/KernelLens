@@ -54,3 +54,33 @@ coverage.xml
 
 # The bundled SQLite knowledge database is release content, not a cache.
 !src/kernellens/data/tilelang/index.sqlite3
+
+# Local test suite, evaluation data and acceptance tooling
+/tests/
+/knowledge/
+/pytest.ini
+/scripts/*
+!/scripts/sync_diagrams.py
+
+# Keep step-by-step learning notes local; publish the current product docs
+/docs/*
+!/docs/README.md
+!/docs/agent-guide.md
+!/docs/cli.md
+!/docs/tui.md
+!/docs/tilelang-rag.md
+!/docs/status.md
+!/docs/validation.md
+!/docs/rag-validation.md
+!/docs/repository.md
+!/docs/decisions/
+!/docs/diagrams/
+/docs/diagrams/*
+!/docs/diagrams/README.md
+!/docs/diagrams/development-flow.md
+!/docs/diagrams/system-architecture.md
+!/docs/diagrams/agent-runtime.md
+!/docs/diagrams/dependency-graph.md
+!/docs/diagrams/learning-path.md
+!/docs/diagrams/cli-agent.md
+!/docs/diagrams/tilelang-rag.md

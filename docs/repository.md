@@ -1,27 +1,32 @@
 # 仓库分发内容
 
-当前仓库为私有，项目许可证暂不指定。上传的是可安装、可检查的 KernelLens 与知识包；后续开放仓库前再确定自有代码的许可。
+当前仓库为私有，项目许可证暂不指定。最新版本按产品使用范围分发 KernelLens 与内置知识包，测试和学习过程文件保留在维护者本地。
 
 | 上传 | 用途 |
 | --- | --- |
-| `src/` | Agent 实现以及内置知识数据库、manifest、来源和上游许可 |
-| `tests/`、`knowledge/` | 自动测试、检索回归问题 |
-| `scripts/`、`examples/` | 开发检查、维护命令、显式真实验收和报告模板 |
-| `docs/`、README、CONTRIBUTING、SECURITY、NOTICE | 使用、设计、验证、协作与第三方说明 |
-| `pyproject.toml`、`uv.lock`、`.python-version` | 安装入口、依赖声明及可复现版本 |
-| `.env.example`、`.gitignore`、`.gitattributes`、`.github/` | 配置模板、忽略/文件规则和 issue/PR 模板 |
+| `src/` | Agent、TUI、命令联想、内置知识数据库与上游许可 |
+| `docs/` 中的使用/原理文档、架构决策和总览图源 | 说明功能、配置、工作原理与当前边界 |
+| `scripts/sync_diagrams.py` | 从独立图源生成五图展示页 |
+| `examples/verification-report.example.json` | 用户回传真实服务器验证结果的格式模板 |
+| README、CONTRIBUTING、SECURITY、NOTICE | 使用、贡献、安全和第三方说明 |
+| `pyproject.toml`、`uv.lock`、`.python-version` | 安装入口、运行/开发依赖与版本锁定 |
+| `.env.example`、`.gitignore`、`.gitattributes`、`.github/` | 配置模板、文件规则和 issue/PR 模板 |
 
 | 留在本地 | 原因 |
 | --- | --- |
-| `.env`、凭证、私钥 | 每个使用者提供自己的配置，不能随仓库分发 |
-| `.kernellens/`、`artifacts/` | 会话、模型响应、日志、临时实验和未验收候选 |
-| `tilelang/` | 维护者的独立上游克隆；普通用户只需要内置知识包 |
-| `.venv/`、各类缓存、`dist/`、`build/` | 可由锁文件和构建命令重新生成 |
-| AGENTS、PROJECT_STATE、一次性实施计划 | 个人协作指令和工作状态；公开入口使用本目录的状态及设计文档 |
-| 系统/编辑器临时文件 | 与运行和维护无关 |
+| `tests/`、`pytest.ini` | 完整开发回归；不是运行 Agent 必需内容 |
+| `knowledge/evaluation_queries.json` | 维护者的检索评估数据；区别于 `src/` 中必需的知识包 |
+| 测试、评估及真实验收脚本 | 维护者检查工具，不是产品启动入口 |
+| 逐步学习讲义和对应细节图 | 保留开发过程，当前使用与原理由主文档说明 |
+| `.env`、凭证、私钥 | 每个使用者提供自己的配置 |
+| `.kernellens/`、`artifacts/` | 会话、日志、临时实验及未验收候选 |
+| `tilelang/` | 独立上游克隆；用户只需要内置知识包 |
+| `.venv/`、缓存、`dist/`、`build/` | 可以重新安装或生成 |
+| AGENTS、PROJECT_STATE、一次性计划 | 个人协作与工作状态 |
+| 系统/编辑器临时文件 | 与运行无关 |
 
-内置 `index.sqlite3` 是产品运行数据，必须上传；不能因为它是数据库或二进制文件就当缓存忽略。临时 SQLite sidecar 文件不上传。
+内置 `src/kernellens/data/tilelang/index.sqlite3` 是产品数据，必须上传；不能当作缓存删除。SQLite sidecar 临时文件不上传。第三方许可与正文一同保留。
 
-GitHub 初始提交采用经过整理的快照，旧学习提交保留在本地历史分支，不推送。忽略规则不会清除旧提交内容，因此不能直接把含个人工作状态的旧历史一起推到新仓库。
+此前上传过的测试和讲义从最新版本移除，本机文件仍保留。旧提交仍可查看这些内容；本次采用正常追加提交，不重写远端历史。更早的个人学习历史分支仍只保留在本地，不推送。
 
-自动化检查以 `uv run --locked python scripts/check_project.py` 为入口。当前上传不预设 GitHub Actions 已运行，也不发布 PyPI 包或 GitHub Release。
+用户可按 [贡献指南](../CONTRIBUTING.md) 执行源码、知识包、图源和构建检查；[验证说明](validation.md) 另外记录维护者本地测试。当前没有发布 PyPI 包、GitHub Release 或运行 GitHub Actions。

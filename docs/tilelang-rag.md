@@ -166,18 +166,16 @@ uv run --locked python -m kernellens.knowledge bundle \
 
 - **抽取/导出校验**：构建时核对源文件哈希、行范围与正文；随包模式校验快照完整性，来源信息保留为元数据。
 - **独立安装验证**：安装 wheel 后禁止访问原 TileLang 克隆与原 KernelLens 源码，仍可默认检索、阅读、核对 API 并完成本地替身 Agent 流程。
-- **检索评估**：固定的 28 个跨类别问题召回预期来源，并满足预算与候选上限。评估集是可见回归集，不是模型准确率或盲测成绩。
+- **检索评估**：固定的 28 个跨类别问题召回预期来源，并满足预算与候选上限。评估集由维护者在本地保留，不是模型准确率或盲测成绩。
 - **工程测试**：循环导出、API 覆盖、语义边界、未知符号、过期来源、分页、扩库噪声、工具边界和 Agent 首次预检索。
 - **生成静态检查**：公开导出与关键字名可被源码确认；识别冲突和未知情况；另检查可识别的局部 fragment 是否在 GEMM 前初始化，漏掉清零会阻止交付。分支、辅助函数和动态 clear 标志无法确定时保留 inconclusive。没有执行参数类型检查、TileLang lowering 或 GPU 编译。
-- **真实模型验收**：由显式脚本检查模型是否实际使用知识工具，并保存候选及静态检查结果。完整记录见 [RAG 验证记录](rag-validation.md)，包括失败、修正和未完成的签名/GPU 检查。不能用 HTTP 成功代替算子正确。
+- **真实模型验收**：维护者通过本地脚本检查模型是否实际使用知识工具，并保存候选及静态检查结果。完整记录见 [RAG 验证记录](rag-validation.md)，包括失败、修正和未完成的签名/GPU 检查。不能用 HTTP 成功代替算子正确。
+
+仓库可直接执行知识包完整性检查与普通检索；固定评估问题、评估脚本和真实验收脚本保留在维护者本地。
 
 ```bash
-# 离线检索回归
-uv run --locked python scripts/evaluate_knowledge.py \
-  --output .kernellens/rag-evaluation/current.json
-
-# 显式真实调用，可能计费；默认只运行解释任务
-uv run --locked python scripts/smoke_rag_live.py --run-live --case diagnose
+uv run --locked python -m kernellens.knowledge validate
+uv run --locked python -m kernellens.knowledge search 'T.copy 的同步语义'
 ```
 
 固定尺寸 GEMM 的声明检查支持参数注解、函数体内的 `A: T.Tensor(...)`、`T.empty(...)`、字符串 dtype 和 `T.float16` 等对象写法。`T.const(...)` 的动态尺寸仍标为未知，不从用户要求反填为已验证尺寸。

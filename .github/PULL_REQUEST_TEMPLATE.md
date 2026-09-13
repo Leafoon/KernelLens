@@ -2,7 +2,9 @@
 
 ## Validation
 
-- [ ] `uv run --locked python scripts/check_project.py`
+- [ ] `uv run --locked ruff check src scripts`
+- [ ] `uv run --locked python -m kernellens.knowledge validate`
+- [ ] Minimal reproduction and observed result included
 - [ ] Relevant documentation updated
 - [ ] No credentials, private sessions, or local build artifacts included
 
