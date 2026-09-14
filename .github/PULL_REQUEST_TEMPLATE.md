@@ -2,8 +2,9 @@
 
 ## Validation
 
-- [ ] `uv run --locked ruff check src scripts`
-- [ ] `uv run --locked python -m kernellens.knowledge validate`
+- [ ] `pnpm lint`
+- [ ] `pnpm typecheck`
+- [ ] `pnpm test`
 - [ ] Minimal reproduction and observed result included
 - [ ] Relevant documentation updated
 - [ ] No credentials, private sessions, or local build artifacts included

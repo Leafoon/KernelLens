@@ -15,7 +15,7 @@ assignees: ""
 ## 环境
 
 - KernelLens commit：
-- 操作系统 / Python：
+- 操作系统 / Node.js 版本：
 - 任务类型：generate / optimize / diagnose
 - 目标 GPU（如相关）：
 - 模型名称与接口类型（如相关，不要填写 Key）：
