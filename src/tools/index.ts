@@ -5,6 +5,7 @@
 export { ToolRegistry } from './registry.js';
 export type { ToolDefinition, EvidenceEntry, RegistryConfig } from './registry.js';
 export { Workspace, hash } from './workspace.js';
+export { createToolDefinitions } from './implementations.js';
 export {
   TOOL_SCHEMAS,
   SetTaskContextArgs,

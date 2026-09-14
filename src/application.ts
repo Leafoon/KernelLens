@@ -29,6 +29,8 @@ export interface TurnResult {
 }
 
 /** Configuration for AgentApplication. */
+export type TaskMode = 'generate' | 'optimize' | 'diagnose';
+
 export interface AgentApplicationConfig {
   readonly provider: ModelProvider;
   readonly registry: ToolRegistry;
@@ -67,14 +69,17 @@ export class AgentApplication {
 
   /**
    * Process one user turn — creates the adapter, reviewer, and runs the agent loop.
+   * @param goal - The user's input or task description.
    * @param onToken - Optional callback to receive streaming text tokens.
+   * @param mode - Optional task mode override ('generate'|'optimize'|'diagnose').
    */
-  async turn(goal: string, onToken?: OnTokenFn): Promise<TurnResult> {
+  async turn(goal: string, onToken?: OnTokenFn, mode?: TaskMode): Promise<TurnResult> {
     if (!goal.trim()) {
       throw new Error('任务内容不能为空');
     }
 
-    const systemPrompt = buildSystemPrompt(this.taskType, this.workspaceRoot);
+    const effectiveTaskType = mode ?? this.taskType;
+    const systemPrompt = buildSystemPrompt(effectiveTaskType, this.workspaceRoot);
 
     const adapter = new DecisionAdapter({
       provider: this.provider,

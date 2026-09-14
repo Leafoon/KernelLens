@@ -57,3 +57,6 @@ export const MAX_SCAN_ENTRIES = 10_000;
 // ── Decision Budget ───────────────────────────────────────────────────────────
 /** Default maximum decisions per agent run. */
 export const DEFAULT_MAX_DECISIONS = 30;
+
+/** Application version (synced with package.json). */
+export const APP_VERSION = '0.2.0';

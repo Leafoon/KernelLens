@@ -7,7 +7,7 @@
 
 import * as readline from 'node:readline';
 import chalk from 'chalk';
-import type { AgentApplication, TurnResult } from '../application.js';
+import type { AgentApplication, TaskMode, TurnResult } from '../application.js';
 import { SLASH_COMMANDS } from './types.js';
 
 interface TerminalConfig {
@@ -53,6 +53,9 @@ export async function startTerminal(config: TerminalConfig): Promise<void> {
     }
 
     // Slash commands
+    let mode: TaskMode | undefined;
+    let goal = input;
+
     if (input.startsWith('/')) {
       const [cmd, ...rest] = input.split(/\s+/);
       const argument = rest.join(' ');
@@ -67,19 +70,26 @@ export async function startTerminal(config: TerminalConfig): Promise<void> {
           prompt();
           return;
         case '/generate':
+          mode = 'generate';
+          break;
         case '/optimize':
+          mode = 'optimize';
+          break;
         case '/diagnose':
-          if (!argument) {
-            console.log(chalk.yellow(`Usage: ${cmd} <requirement>`));
-            prompt();
-            return;
-          }
+          mode = 'diagnose';
           break;
         default:
           console.log(chalk.yellow(`Unknown command: ${cmd}. Type /help.`));
           prompt();
           return;
       }
+
+      if (!argument) {
+        console.log(chalk.yellow(`Usage: ${cmd} <requirement>`));
+        prompt();
+        return;
+      }
+      goal = argument;
     }
 
     // Send to agent
@@ -99,7 +109,7 @@ export async function startTerminal(config: TerminalConfig): Promise<void> {
     };
 
     try {
-      const result: TurnResult = await app.turn(input, onToken);
+      const result: TurnResult = await app.turn(goal, onToken, mode);
       const elapsed = ((Date.now() - start) / 1000).toFixed(1);
 
       // If nothing was streamed (tool-only turn), print the answer now

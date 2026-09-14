@@ -5,12 +5,15 @@
  * (interactive terminal, single-shot, or utility commands).
  */
 
-import { resolve } from 'node:path';
+import { existsSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { Command } from 'commander';
 import { AgentApplication } from './application.js';
 import { loadSettings } from './config/loader.js';
+import { APP_VERSION } from './constants.js';
+import { KnowledgeBase } from './knowledge/base.js';
 import { OpenAIProvider } from './models/client.js';
-import { ToolRegistry } from './tools/registry.js';
+import { ToolRegistry, Workspace, createToolDefinitions } from './tools/index.js';
 import { startTerminal } from './tui/terminal.js';
 
 async function startTui(opts: Record<string, string | undefined>): Promise<void> {
@@ -27,7 +30,29 @@ async function startTui(opts: Record<string, string | undefined>): Promise<void>
     maxOutputTokens: config.model.maxOutputTokens ?? 4_096,
   });
 
-  const registry = new ToolRegistry({ tools: [] });
+  // Initialize workspace and tools
+  const workspace = new Workspace(workspaceRoot);
+
+  // Initialize knowledge base (optional)
+  let knowledge: KnowledgeBase | null = null;
+  const knowledgeDir = join(workspaceRoot, 'data', 'tilelang');
+  const bundledDir = join(import.meta.dirname ?? process.cwd(), '..', 'data', 'tilelang');
+  const knowledgePath = existsSync(join(knowledgeDir, 'manifest.json'))
+    ? knowledgeDir
+    : existsSync(join(bundledDir, 'manifest.json'))
+      ? bundledDir
+      : null;
+
+  if (knowledgePath) {
+    try {
+      knowledge = new KnowledgeBase(knowledgePath);
+    } catch {
+      // Knowledge base is optional; continue without it
+    }
+  }
+
+  const toolDefs = createToolDefinitions(workspace, knowledge);
+  const registry = new ToolRegistry({ tools: toolDefs });
 
   const application = new AgentApplication({
     provider,
@@ -44,7 +69,7 @@ export function createCli(): Command {
   const program = new Command()
     .name('kernellens')
     .description('AI agent for TileLang GPU kernel development and optimization')
-    .version('0.2.0');
+    .version(APP_VERSION);
 
   // Default action: start TUI (same as `run`)
   program
