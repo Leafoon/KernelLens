@@ -1,1 +1,0 @@
-"""Cloud model protocol adapters."""
